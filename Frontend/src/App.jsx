@@ -9,38 +9,43 @@ import Modal from 'react-bootstrap/Modal';
 function App() {
     const [data, setData] = useState([])            //  Initializes a state variable called data and a function setData to update this state.
     
-    const [createStudentModalText, setCreateStudentModalText] = useState("");
-    const [createStudentID, setCreateStudentID] = useState(-1);
-    const [createStudentName, setCreateStudentName] = useState("");
-    const [createStudentBirthday, setCreateStudentBirthday] = useState("");
-    const [createStudentGPA, setCreateStudentGPA] = useState(-1);
-    const [isCreatingStudent, setIsCreatingStudent] = useState(false);
+    const [createBookModalText, setCreateBookModalText] = useState("");
+    const [createBookID, setCreateBookID] = useState(-1);
+    const [createBookTitle, setCreateBookTitle] = useState("");
+    const [createBookISBN, setCreateBookISBN] = useState("");
+    const [createBookPrice, setCreateBookPrice] = useState(-1.0);
+    const [createBookCurrentStock, setCreateBookCurrentStock] = useState(-1);
+    const [createBookPublicationYear, setCreateBookPublicationYear] = useState(-1);
+    const [isCreatingBook, setIsCreatingBook] = useState(false);
 
     const [show, setShow] = useState(false);
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
 
-    const editStudent = (idx) => {
-        let student = data[idx];
-        setCreateStudentID(student["id"]);
-        setCreateStudentName(student["name"]);
-        setCreateStudentBirthday(student["birthday"].substr(0, 'XXXX-XX-XX'.length)); // Trimming this string to remove the extra metadata added by the database
-        setCreateStudentGPA(student["gpa"]);
-        setCreateStudentModalText(`Edit ${student["id"]} - ${student["name"]}`);
+    const editBook = (idx) => {
+        let book = data[idx];
+        setCreateBookModalText(`Edit ${book["title"]} - ${book["isbn"]}`);
+        setCreateBookID(book["id"]);
+        setCreateBookTitle(book["title"]);
+        setCreateBookISBN(book["isbn"]);
+        setCreateBookPrice(book["price"]);
+        setCreateBookCurrentStock(book["current_stock"]);
+        setCreateBookPublicationYear(book["publication_year"]);
         handleShow();
     }
-    const deleteStudent = (idx) => {
-        let student = data[idx];
-        if(window.confirm(`Are you sure you want to delete ${student["name"]} (${student["id"]})?`)) {
-            if(window.confirm(`Are you really sure you want to delete ${student["name"]} (${student["id"]})?`)) {
-                if(window.confirm(`Are you REALLY REALLY sure you want to delete ${student["name"]} (${student["id"]})? (THIS IS YOUR LAST CHANCE. ONCE YOU DELETE THEM, THEY'RE GONE FOREVER.)`)) {
-                    let url = `http://localhost:8081/student/${student["id"]}`;
+
+    const deleteBook = (idx) => {
+        let book = data[idx];
+        if(window.confirm(`Are you sure you want to delete ${book["title"]} - ${book["isbn"]} (${book["id"]})?`)) {
+            if(window.confirm(`Are you really sure you want to delete ${book["title"]} - ${book["isbn"]} (${book["id"]})?`)) {
+                if(window.confirm(`Are you REALLY REALLY sure you want to delete ${book["title"]} - ${book["isbn"]} (${book["id"]})? (THIS IS YOUR LAST CHANCE. ONCE YOU DELETE THEM, THEY'RE GONE FOREVER.)`)) {
+                    let url = `http://localhost:8081/books/${book["id"]}`;
                     fetch(url, {
                         method: "DELETE",
                     })
                     .then(data => {
                         console.log(data);
-                        loadStudents();
+                        loadBooks();
                     })
                     .catch(err => {
                         console.log(err);
@@ -51,65 +56,73 @@ function App() {
 
     }
 
-    const createStudent = () => {
-        if(isCreatingStudent){
+    const createBook = () => {
+        if(isCreatingBook){
             return;
         }
-        setIsCreatingStudent(true);
+        setIsCreatingBook(true);
         
-        if(createStudentName == "" || createStudentBirthday == "" || createStudentGPA <= -0.01 || createStudentGPA > 4){
-            setIsCreatingStudent(false);
+        if(
+            createBookTitle == "" ||
+            createBookISBN == "" ||
+            createBookPrice < 0.00 || createBookPrice > 300.00 ||
+            createBookCurrentStock < 0 ||
+            createBookPublicationYear < 0
+        ) {
+            setIsCreatingBook(false);
             return;
         }
 
-        let url = createStudentID == -1 ? 'http://localhost:8081/student' : `http://localhost:8081/student/${createStudentID}`;
-        let method = createStudentID == -1 ? "POST" : "PUT";
+        let url = createBookID == -1 ? 'http://localhost:8081/books' : `http://localhost:8081/books/${createBookID}`;
+        let method = createBookID == -1 ? "POST" : "PUT";
         fetch(url, {
             method: method,
             headers: {
             'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                "name": createStudentName,
-                "birthday": createStudentBirthday,
-                "gpa" : createStudentGPA
+                "title": createBookTitle,
+                "isbn": createBookISBN,
+                "price": createBookPrice,
+                "current_stock": createBookCurrentStock,
+                "publication_year": createBookPublicationYear,
             })
         })
         .then(response => response.json())
         .then(data => {
-            setIsCreatingStudent(false);
+            setIsCreatingBook(false);
             if(data["status"]){
                 console.log(data);
                 handleClose();
-                loadStudents();
+                loadBooks();
             } else {
                 console.log(data);
-                console.error("Failed to create student!");
+                console.error("Failed to create book!");
             }
         })
         .catch(err => {
-            setIsCreatingStudent(false);
+            setIsCreatingBook(false);
             console.log(err);
         });
     };
 
-    const loadStudents = () => {
+    const loadBooks = () => {
                                        // define the userEffect hook, useEffect(() => { ... }, [])
-           fetch('http://localhost:8081/listall')       // call backend route
+           fetch('http://localhost:8081/books')       // call backend route
            .then(response => response.json())           // Converts the response from the fetch request into JSON format.
            .then(data => {                              // Updates the state variable data with the fetched data using the setData function.
                 if(data["status"]){
                     setData(data["data"]);
                 } else {
                     console.log(data);
-                    console.error("Failed to load students!");
+                    console.error("Failed to load books!");
                 }
            })                 
            .catch(err => console.log(err));             // logs the error msg to the console.
     }
 
     useEffect(() => {
-        loadStudents();
+        loadBooks();
     }, [])                                          // The empty dependency array [] means it only runs once when the component is first rendered.
                                                     // to be rendered in the UI
 
@@ -118,70 +131,100 @@ return(
 
         <div style={{width: '100%', display: 'grid', alignItems: 'center', justifyContent: 'center', margin: '20px 0'}}>
             <Button variant="primary" onClick={() => {
-                setCreateStudentModalText("Create Student");
-                setCreateStudentID(-1);
-                setCreateStudentName("");
-                setCreateStudentBirthday("");
-                setCreateStudentGPA(-1);
+                setCreateBookModalText("Create Book");
+                setCreateBookID(-1);
+                setCreateBookTitle("");
+                setCreateBookISBN("");
+                setCreateBookPrice(-1.00);
+                setCreateBookCurrentStock(-1);
+                setCreateBookPublicationYear(-1);
                 handleShow();
             }}>
-                Create Student
+                Create Book
             </Button>
         </div>
 
         <Modal show={show} onHide={handleClose}>
             <Modal.Header closeButton>
-            <Modal.Title>{createStudentModalText}</Modal.Title>
+            <Modal.Title>{createBookModalText}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 <table className="styled-table">
                     <tbody>
                         <tr>
-                            <td>Student Name</td>
+                            <td>Title</td>
                             <td>
-                                <Form.Control type='text' placeholder='Student Name'
-                                value={createStudentName}
+                                <Form.Control type='text' placeholder='Title'
+                                value={createBookTitle}
                                 onChange={(event) => {
                                     console.log(event.target.value);
-                                    setCreateStudentName(event.target.value);
+                                    setCreateBookTitle(event.target.value);
                                 }} onInput={(event) => {
                                     console.log(event.target.value);
-                                    setCreateStudentName(event.target.value);
+                                    setCreateBookTitle(event.target.value);
                                 }}
                                 />
                             </td>
                         </tr>
                         <tr>
-                            <td>Birthday</td>
-                            <td><Form.Control type='date' placeholder='Birthday'
-                                value={createStudentBirthday}
+                            <td>ISBN</td>
+                            <td>
+                                <Form.Control type='text' placeholder='ISBN'
+                                value={createBookISBN}
                                 onChange={(event) => {
                                     console.log(event.target.value);
-                                    setCreateStudentBirthday(event.target.value);
+                                    setCreateBookISBN(event.target.value);
                                 }} onInput={(event) => {
                                     console.log(event.target.value);
-                                    setCreateStudentBirthday(event.target.value);
+                                    setCreateBookISBN(event.target.value);
+                                }}
+                                />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Price ($)</td>
+                            <td><Form.Control type='number' min={0.01} placeholder='Price ($)'
+                                value={createBookPrice < 0.00 ? '' : createBookPrice}
+                                onChange={(event) => {
+                                    console.log(event.target.value);
+                                    setCreateBookPrice(event.target.value);
+                                }} onInput={(event) => {
+                                    console.log(event.target.value);
+                                    setCreateBookPrice(event.target.value);
                                 }}
                             /></td>
                         </tr>
                         <tr>
-                            <td>GPA</td>
-                            <td><Form.Control type='number' min={0.1} placeholder='GPA'
-                                value={createStudentGPA == -1 ? '' : createStudentGPA}
+                            <td>Current Stock</td>
+                            <td><Form.Control type='number' min={0} placeholder='Current Stock'
+                                value={createBookCurrentStock == -1 ? '' : createBookCurrentStock}
                                 onChange={(event) => {
                                     console.log(event.target.value);
-                                    setCreateStudentGPA(event.target.value);
+                                    setCreateBookCurrentStock(event.target.value);
                                 }} onInput={(event) => {
                                     console.log(event.target.value);
-                                    setCreateStudentGPA(event.target.value);
+                                    setCreateBookCurrentStock(event.target.value);
+                                }}
+                            /></td>
+                        </tr>
+                        <tr>
+                            <td>Publication Year</td>
+                            <td><Form.Control type='number' min={0} placeholder='Publication Year'
+                                value={createBookPublicationYear == -1 ? '' : createBookPublicationYear}
+                                onChange={(event) => {
+                                    console.log(event.target.value);
+                                    setCreateBookPublicationYear(event.target.value);
+                                }} onInput={(event) => {
+                                    console.log(event.target.value);
+                                    setCreateBookPublicationYear(event.target.value);
                                 }}
                             /></td>
                         </tr>
                         <tr>
                             <td colSpan={2}>
                                 <div className="d-grid gap-2">
-                                    <Button variant='success' size="lg" onClick={createStudent}>
-                                        {createStudentModalText}
+                                    <Button variant='success' size="lg" onClick={createBook}>
+                                        {createBookModalText}
                                     </Button>
                                 </div>
                             </td>
@@ -195,10 +238,12 @@ return(
        <table className="styled-table">
        <thead>
           <tr>
-            <th>id</th>
-            <th>name</th>
-            <th>birthday</th>
-            <th>gpa</th>
+            <th>ID</th>
+            <th>Title</th>
+            <th>ISBN</th>
+            <th>Price</th>
+            <th>Current Stock</th>
+            <th>Publication Year</th>
             <th>Edit</th>
             <th>Delete</th>
           </tr>
@@ -207,11 +252,13 @@ return(
              {data.map((d, i) => (                 // Maps over the data array to create a table row (<tr>) for each item d in data. The index i is used as a unique key for each row.
                   <tr key={i}>
                     <td>{d.id}</td>
-                    <td>{d.name}</td>
-                    <td>{new Date(d.birthday).toLocaleDateString()}</td>
-                    <td>{d.gpa}</td>
-                    <td> <Button variant='warning' onClick={() => editStudent(i)}>Edit</Button> </td>
-                    <td> <Button variant='danger' onClick={() => deleteStudent(i)}>Delete</Button> </td>
+                    <td>{d.title}</td>
+                    <td>{d.isbn}</td>
+                    <td>{d.price}</td>
+                    <td>{d.current_stock}</td>
+                    <td>{d.publication_year}</td>
+                    <td> <Button variant='warning' onClick={() => editBook(i)}>Edit</Button> </td>
+                    <td> <Button variant='danger' onClick={() => deleteBook(i)}>Delete</Button> </td>
                   </tr>
              ))}
        </tbody>

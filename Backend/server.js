@@ -67,7 +67,7 @@ app.put('/books/:id', (request, response) => {
     const bookId = request.params.id;
     let params = request.body;
 
-    let required_keys = ["name", "birthday", "gpa"];
+    let required_keys = ["title", "isbn", "price", "current_stock", "publication_year"];
     
     let params_keys = Object.keys(params);
     let missing_keys = [];
@@ -106,7 +106,7 @@ app.post('/books', (request, response) => {
         return response.status(406).json({"status": false, "message": `${missing_keys.join(', ')} are missing!`});
     }
 
-    const sql = `INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE (?, ?, ?);`;
+    const sql = `INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE (?, ?, ?, ?, ?);`;
     db.query(sql, [params["title"], params["isbn"], params["price"], params["current_stock"], params["publication_year"]], (err, data) => {
         if (err) return response.json(err);
         if (data.length === 0) return response.status(404).json({ "status": false, "message": "Failed to add book!", "data": err });
