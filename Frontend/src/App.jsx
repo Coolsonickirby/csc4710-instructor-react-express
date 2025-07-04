@@ -8,7 +8,9 @@ import Modal from 'react-bootstrap/Modal';
 
 function App() {
     const [data, setData] = useState([])            //  Initializes a state variable called data and a function setData to update this state.
-    
+    const [searchBookTitle, setSearchBookTitle] = useState("");
+    const [isSearchMode, setIsSearchMode] = useState(false);
+
     const [createBookModalText, setCreateBookModalText] = useState("");
     const [createBookID, setCreateBookID] = useState(-1);
     const [createBookTitle, setCreateBookTitle] = useState("");
@@ -56,6 +58,26 @@ function App() {
 
     }
 
+    const searchBook = () => {
+        if(searchBookTitle.trim() == ""){
+            setIsSearchMode(false);
+            loadBooks();
+        } else {
+            setIsSearchMode(true);
+            fetch(`http://localhost:8081/books/search/${searchBookTitle.trim()}`)       // call backend route
+           .then(response => response.json())           // Converts the response from the fetch request into JSON format.
+           .then(data => {                              // Updates the state variable data with the fetched data using the setData function.
+                if(data["status"]){
+                    setData(data["data"]);
+                } else {
+                    console.log(data);
+                    console.error("Failed to load books!");
+                }
+           })                 
+           .catch(err => console.log(err));             // logs the error msg to the console.
+        }
+    }
+
     const createBook = () => {
         if(isCreatingBook){
             return;
@@ -94,7 +116,11 @@ function App() {
             if(data["status"]){
                 console.log(data);
                 handleClose();
-                loadBooks();
+                if(isSearchMode){
+                    searchBook();
+                } else {
+                    loadBooks();
+                }
             } else {
                 console.log(data);
                 console.error("Failed to create book!");
@@ -234,8 +260,27 @@ return(
             </Modal.Body>
         </Modal>
 
+        
+        <table style={{margin:"50px auto", width:"400px"}}>
+            <tr>
+                <td style={{paddingRight: "10px"}}>
+                    <Form.Control type="text" placeholder="Search Book Title" value={searchBookTitle} 
+                        onChange={(event) => {
+                            console.log(event.target.value);
+                            setSearchBookTitle(event.target.value);
+                        }} onInput={(event) => {
+                            console.log(event.target.value);
+                            setSearchBookTitle(event.target.value);
+                        }}>
+                    </Form.Control>
+                </td>
+                <td>
+                    <Button variant='primary' onClick={searchBook}>Search!</Button>
+                </td>
+            </tr>
+        </table>
 
-       <table className="styled-table">
+       <table className="styled-table" style={{marginBottom: "50px"}}>
        <thead>
           <tr>
             <th>ID</th>
@@ -249,18 +294,22 @@ return(
           </tr>
        </thead>
        <tbody>
-             {data.map((d, i) => (                 // Maps over the data array to create a table row (<tr>) for each item d in data. The index i is used as a unique key for each row.
-                  <tr key={i}>
-                    <td>{d.id}</td>
-                    <td>{d.title}</td>
-                    <td>{d.isbn}</td>
-                    <td>{d.price}</td>
-                    <td>{d.current_stock}</td>
-                    <td>{d.publication_year}</td>
-                    <td> <Button variant='warning' onClick={() => editBook(i)}>Edit</Button> </td>
-                    <td> <Button variant='danger' onClick={() => deleteBook(i)}>Delete</Button> </td>
-                  </tr>
-             ))}
+        {
+            (data.length <= 0) ? <tr>
+                <td colSpan={8}><h2 style={{textAlign: "center"}}>No Results Found!</h2></td>
+            </tr> : data.map((d, i) => (                 // Maps over the data array to create a table row (<tr>) for each item d in data. The index i is used as a unique key for each row.
+                    <tr key={i}>
+                        <td>{d.id}</td>
+                        <td>{d.title}</td>
+                        <td>{d.isbn}</td>
+                        <td>{d.price}</td>
+                        <td>{d.current_stock}</td>
+                        <td>{d.publication_year}</td>
+                        <td> <Button variant='warning' onClick={() => editBook(i)}>Edit</Button> </td>
+                        <td> <Button variant='danger' onClick={() => deleteBook(i)}>Delete</Button> </td>
+                    </tr>
+                    ))
+        }
        </tbody>
        </table>
     </div>

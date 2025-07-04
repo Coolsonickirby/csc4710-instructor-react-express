@@ -53,6 +53,16 @@ app.get('/books/:id', (request, response) => {
     });
 });
 
+// yoinked from the canvas assignment page
+app.get('/books/search/:title', (req, res) => {
+  const title = req.params.title;
+  const sql = "SELECT * FROM books WHERE title LIKE ?";
+  db.query(sql, [`%${title}%`], (err, results) => {
+    if (err) return res.status(500).json(err);
+    return res.json({"data": results, "status": true, "message": "Successfully found books!"})
+  });
+});
+
 app.delete('/books/:id', (request, response) => {
     const bookId = request.params.id;
     const sql = "DELETE FROM books WHERE id = ?";
