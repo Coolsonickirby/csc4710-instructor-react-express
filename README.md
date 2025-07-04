@@ -9,10 +9,10 @@ GitHub Repo: [https://github.com/atahabilder1/csc4710-instructor-react-express](
 
 ## 📌 Project Description
 
-This application serves as a **student records system**, where instructors or users can:
+This application serves as a **BookNest Inventory Manager**, where instructors or users can:
 
-- View all student records
-- Fetch individual student details by ID
+- View all book records
+- Fetch individual book details by ID
 - Learn how frontend components interact with backend routes
 - Understand full stack CRUD operations (read-only for now)
 
@@ -20,164 +20,165 @@ The backend provides **RESTful API endpoints** built with **Express**, which int
 
 ---
 
-## 🧠 How the Components Interact
-
-This project highlights the flow of data from the frontend (React) to the backend (Express) and into the MySQL database.
-
-### 🔁 Component Communication Flow:
-
-```
-User → React Component → HTTP Request → Express API → MySQL → Response → React UI
-```
-
-### 💡 Example Breakdown
-
-
-#### 1. React (Frontend)
-```jsx
-useEffect(() => {
-  fetch('http://localhost:8081/listall')
-    .then(res => res.json())
-    .then(data => setData(data));
-}, []);
-```
-- Sends a **GET** request to the backend endpoint `/listall`.
-- Once the data is received, it's in **JSON format**.
-- This JSON is then saved into React's state using `setData(data)`.
-
-#### 2. Express (Backend)
-```js
-app.get('/listall', (req, res) => {
-  db.query("SELECT * FROM students", (err, data) => {
-    if (err) return res.json(err);
-    return res.json(data);
-  });
-});
-```
-- Receives the request from React.
-- Executes the SQL query `SELECT * FROM students`.
-- Converts the database result into JSON and sends it back to the frontend.
-
-#### 3. MySQL (Database)
-- Holds the actual student records.
-- The query result from MySQL is structured into rows of data, such as:
-```json
-[
-  { "id": 1, "name": "Ali", "birthday": "2000-01-01", "gpa": 3.9 },
-  { "id": 2, "name": "Sara", "birthday": "1999-06-15", "gpa": 3.7 }
-]
-```
-
-#### 4. React Rendering
-- The frontend maps over the JSON array using `.map()`:
-```jsx
-{data.map((d, i) => (
-  <tr key={i}>
-    <td>{d.id}</td>
-    <td>{d.name}</td>
-    <td>{new Date(d.birthday).toLocaleDateString()}</td>
-    <td>{d.gpa}</td>
-  </tr>
-))}
-```
-- Each student object becomes one row in the HTML table.
-
----
-
-## ✨ Features
-
-- Express-based backend with REST endpoints
-- MySQL database for persistent data
-- React + Vite frontend for interactive UI
-- CORS-enabled API access
-- Clean project structure for teaching modular development
-
----
-
-## 🧰 Installation Tools and Their Purpose
-
-| Tool         | Used In    | Purpose |
-|--------------|------------|---------|
-| `Node.js`    | Both       | Runtime for JavaScript on backend; required for npm scripts |
-| `npm`        | Both       | Node package manager used to install dependencies |
-| `nodemon`    | Backend    | Automatically restarts the server when file changes are detected |
-| `express`    | Backend    | Web framework for building the REST API |
-| `mysql`      | Backend    | Allows Node.js to connect to a MySQL database |
-| `cors`       | Backend    | Enables cross-origin requests from frontend |
-| `vite`       | Frontend   | Fast frontend build tool for React |
-| `react`      | Frontend   | Builds the user interface |
-| `react-dom`  | Frontend   | Renders React components to the DOM |
-
----
-
-⚠️ **Note:** This project requires **Node.js version 20** or higher. Please ensure you have it installed before running the steps below.
-
-## 🚀 Getting Started
-
-### 🚀 Step 1: Install Node.js
-
-Please follow the steps below to set up your development environment:
-
-#### ✅ 1. Install Node.js 20.xxx (includes npm)
-- Go to the official website:  
-  👉 [https://nodejs.org/dist/v20.19.3/node-v20.19.3-x64.msi](https://nodejs.org/dist/v20.19.3/node-v20.19.3-x64.msi)
-- Download the **LTS version (recommended)** for your operating system.
-- Run the installer and complete the setup.
-
-> Note: **npm (Node Package Manager)** is automatically installed with Node.js.
-
----
-
-#### ✅ 2. Verify the installation
-
-Open your terminal (Command Prompt, PowerShell, or Terminal) and run:
-
-```bash
-node -v
-```
-
-This should print something like:
-
-```
-v20.10.0
-```
-
-Then run:
-
-```bash
-npm -v
-```
-
-You should see something like:
-
-```
-10.2.1
-```
-
-If both versions show correctly, you're all set! ✅
-
-
 Create a database named test. Create a table called students in the test database as follows:
 ```sql
 -- Create the database
-CREATE DATABASE test;
+CREATE DATABASE throwaway;
 
 -- Use the database
-USE test;
+USE throwaway;
 
 -- Create the students table
-CREATE TABLE students (
-    id SMALLINT,
-    name VARCHAR(100),
-    birthday DATE,
-    gpa FLOAT
-);
+CREATE TABLE `books` (
+	`id` INT(10) NOT NULL AUTO_INCREMENT,
+	`title` VARCHAR(500) NOT NULL COLLATE 'utf8mb3_general_ci',
+	`isbn` VARCHAR(500) NOT NULL COLLATE 'utf8mb3_general_ci',
+	`price` DOUBLE NOT NULL DEFAULT '0',
+	`current_stock` INT(10) NOT NULL DEFAULT '0',
+	`publication_year` INT(10) NOT NULL,
+	PRIMARY KEY (`id`) USING BTREE
+)
+COLLATE='utf8mb3_general_ci'
+ENGINE=InnoDB
+AUTO_INCREMENT=1;
 
--- Insert records into students
-INSERT INTO students VALUE (1, "peter", '1988-08-22', 3.1);
-INSERT INTO students VALUE (2, "kathy", '1997-08-12', 3.2);
-INSERT INTO students VALUE (3, "mike", '1999-08-02', 3.3);
-INSERT INTO students VALUE (4, "john", '1998-06-13', 3.7);
+-- Data sourced from https://www.topshelfcomix.com/catalog/isbn-list
+-- Insert records into books
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Ashes', '978-1-60309-517-4', 19.99, 77, 2017);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Belzebubs', '978-1-60309-442-9', 14.99, 71, 1985);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Belzebubs (Vol 2): No Rest for the Wicked', '978-1-60309-542-6', 19.99, 78, 1994);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('But You Have Friends', '978-1-60309-527-3', 14.99, 53, 2000);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Chester 5000 (Book 1)', '978-1-60309-535-8', 19.99, 40, 1991);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Cosmic Cadets (Book One): Contact!', '978-1-60309-520-4', 14.99, 19, 2010);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Cosmoknights (Book One)', '978-1-60309-454-2', 19.99, 37, 2002);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Cosmoknights (Book Two)', '978-1-60309-511-2', 24.99, 39, 2002);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Deja Ross Speaks to Freaks', '978-1-60309-540-2', 19.99, 83, 2024);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('The Delicacy', '978-1-60309-492-4', 24.99, 52, 2024);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Doughnuts and Doom', '978-1-60309-513-6', 14.99, 83, 2001);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Dragon Puncher (Book 3): Dragon Puncher Punches Back', '978-1-60309-514-3', 9.99, 34, 2011);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Dreamover', '978-1-60309-546-4', 19.99, 31, 1988);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Edmund White''s A Boy''s Own Story: The Graphic Novel', '978-1-60309-508-2', 29.99, 4, 2017);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Essex County', '978-1-60309-038-4', 29.95, 74, 1994);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('F.A.R.M. System', '978-1-60309-515-0', 19.99, 77, 2004);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Free Pass', '978-1-60309-505-1', 19.99, 61, 2013);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('From Hell: Master Edition #03 (of 10)', 'UPC 827714016215 00311', 7.99, 84, 2015);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('From Hell: Master Edition #05 (of 10)', 'UPC 827714016215 00511', 7.99, 65, 2021);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('From Hell: Master Edition #07 (of 10)', 'UPC 827714016215 00711', 7.99, 80, 2012);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('From Hell: Master Edition #08 (of 10)', 'UPC 827714016215 00811', 7.99, 44, 1988);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('From Hell: Master Edition #09 (of 10)', 'UPC 827714016215 00911', 7.99, 21, 2008);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('From Hell: Master Edition #10 (of 10)', 'UPC 827714016215 01011', 7.99, 61, 1989);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('From Hell: Master Edition -- HARDCOVER ', '978-1-60309-469-6', 49.99, 0, 1985);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('The Fun Family', '978-1-60309-344-6', 24.99, 31, 1985);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Funny Things: A Comic Strip Biography of Charles M. Schulz ', '978-1-60309-526-6', 39.99, 17, 2005);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Glork Patrol (Book Two): Glork Patrol Takes a Bath', '978-1-60309-504-4', 9.99, 11, 2001);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Glork Patrol (Book Three): Glork Patrol and the Magic Robot', '978-1-60309-521-1', 9.99, 75, 2019);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Hey, Mister (Vol 1): After School Special by Sickman-Garner', '978-1-891830-02-0', 7.95, 77, 2016);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Hey, Mister (Vol 3): The Fall Collection by S-Garner', '978-1-891830-25-9', 12.95, 65, 2007);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Hey, Mister: Come Hell or Highwater Pants', '978-1-60309-030-8', 14.95, 38, 2001);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Home Time: Under the River', '978-1-60309-412-2', 24.99, 23, 2013);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('In Perpetuity', '978-1-60309-537-2', 19.99, 34, 2010);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('In Utero', '978-1-60309-534-1', 24.99, 21, 1994);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Incredible Change-Bots One', '978-1-891830-91-4', 14.95, 85, 1994);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Incredible Change-Bots Two', '978-1-60309-067-4', 14.95, 8, 1990);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('It Rhymes With Takei (HARDCOVER)', '978-1-60309-574-7', 29.99, 38, 1990);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('It Rhymes with Takei (SIGNED & NUMBERED HARDCOVER)', '978-1-60309-575-4', 99.99, 11, 2014);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Jimmy''s Elbow', '978-1-60309-541-9', 14.99, 43, 2008);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Johnny Boo (Book 2): Twinkle Power', '978-1-60309-015-5', 9.95, 40, 2014);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Johnny Boo (Book 3): Happy Apples', '978-1-60309-041-4', 9.95, 26, 1996);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Johnny Boo (Book 5): Does Something!', '978-1-60309-084-1', 9.95, 57, 1992);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Johnny Boo (Book 6): Zooms to the Moon!', '9781603093491', 9.99, 36, 2005);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Johnny Boo (Book 7): Goes Like This!', '978-1-60309-384-2', 9.99, 66, 1995);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Johnny Boo (Book 13): Johnny Boo Goes to School', '978-1-60309-503-7', 9.99, 70, 2004);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Johnny Boo (Book 14): Johnny Boo is Bored! Bored! Bored!', '978-1-60309-533-4', 11.99, 66, 1988);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Johnny Boo Meets Dragon Puncher!', '9781603093682', 9.99, 25, 2023);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Johnny Boo''s Big Boo Box (Slipcase Set of Books 1-5) All ages (4-8+)', '978-1-60309-385-9', 39.99, 16, 1994);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Junkwraith', '978-1-60309-500-6', 24.99, 36, 1993);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Kodi', '978-1-60309-467-2', 14.99, 63, 1990);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Korgi: The Complete Tale', '978-1-60309-538-9', 39.99, 73, 2019);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('The League of Extraordinary Gentlemen (Vol III): Century - HARDCOVER', '978-1-60309-329-3', 29.95, 1, 2019);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('The League of Extraordinary Gentlemen (Vol IV): The Tempest #2 (of 6)', 'UPC 827714014280 00211', 4.99, 75, 2018);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('The League of Extraordinary Gentlemen (Vol IV): The Tempest #3 (of 6)', 'UPC 827714014280 00311', 4.99, 82, 1985);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('The League of Extraordinary Gentlemen (Vol IV): The Tempest #4 (of 6)', 'UPC 827714014280 00411', 4.99, 35, 2000);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('The League of Extraordinary Gentlemen (Vol IV): The Tempest #5 (of 6)', 'UPC 827714014280 00511', 4.99, 79, 1983);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('The League of Extraordinary Gentlemen (Vol IV): The Tempest #6 (of 6)', 'UPC 827714014280 00611', 4.99, 3, 2024);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('The League of Extraordinary Gentlemen (Vol IV): The Tempest (TPB)', '978-1-60309-496-2', 19.99, 13, 2016);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('The League of Extraordinary Gentlemen (Vol IV): The Tempest -- HARDCOVER', '978-1-60309-456-6', 29.99, 36, 1984);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Lisa Cheese and Ghost Guitar (Book 1): Attack of the Snack', '978-1-60309-528-0', 19.99, 12, 1999);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Lost Girls (Expanded Edition)', '978-1-60309-436-8', 49.99, 9, 2024);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Love Languages', '978-1-60309-557-0', 19.99, 36, 1992);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Loved and Lost: A Relationship Trilogy', '978-1-60309-506-8', 29.99, 69, 1987);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Low Orbit', '978-1-60309-552-5', 24.99, 76, 2008);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('March (Trilogy Slipcase Set)', '978-1-60309-395-8', 49.99, 13, 2002);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('March: Book One', '978-1-60309-300-2', 14.95, 39, 2014);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('March: Book Three', '978-1-60309-402-3', 19.99, 10, 2002);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('March: Book Three -- HARDCOVER', '978-1-60309-396-5', 29.99, 31, 2011);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Mary Tyler MooreHawk', '978-1-60309-536-5', 29.99, 18, 2014);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Monster on the Hill (Expanded Edition)', '978-1-60309-491-7', 19.95, 31, 2012);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('The Moon and Serpent Bumper Book of Magic', '978-1-60309-550-1', 49.99, 30, 1985);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Nemo: Heart of Ice', '978-1-60309-274-6', 14.95, 61, 1995);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Nemo: River of Ghosts', '978-1-60309-355-2', 14.95, 39, 2012);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Nemo: The Roses of Berlin', '978-1-60309-320-0', 14.95, 75, 1997);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Onion Skin', '978-1-60309-489-4', 14.99, 17, 2000);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Order of the Night Jay (Book 1): The Forest Beckons', '978-1-60309-510-5', 14.99, 22, 2014);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Our Expanding Universe', '978-1-60309-377-4', 19.99, 25, 2008);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Parenthesis', '978-1-60309-481-8', 19.99, 72, 2023);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Pinocchio, Vampire Slayer (Vol. 2): The Great Puppet Theater', '9781603093255', TBD, 26, 2005);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Radical: My Year with a Socialist Senator', '978-1-60309-512-9', 24.99, 11, 2016);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Red Panda & Moon Bear (Book Two): The Curse of the Evil Eye', '978-1-60309-501-3', 14.99, 1, 1987);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Return of the Dapper Men (Deluxe Edition)', '978-1-60309-413-9', 34.99, 1, 2016);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Rivers', '978-1-60309-490-0', 19.99, 15, 2011);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Rose Wolves (Book 1)', '978-1-60309-531-0', 14.99, 77, 2004);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('The Second Fake Death of Eddie Campbell & The Fate of the Artist [FLIP HARDCOVER]', '978-1-60309-524-2', 29.99, 41, 1994);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Secret Passages', '978-1-60309-499-3', 19.99, 35, 2011);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Shadowplay (Book 1): Midnight School', '978-1-60309-548-8', 24.99, 12, 2004);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Shelley Frankenstein! (Book One): CowPiggy', '978-1-60309-522-8', 14.99, 15, 2005);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Shred or Dead', '978-1-60309-547-1', 19.99, 64, 1993);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Skull Cat (Book One): Skull Cat and the Curious Castle', '978-1-60309-519-8', 14.99, 81, 2016);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Space Junk', '978-1-60309-543-3', 19.99, 3, 2020);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Super Trash Clash', '978-1-60309-516-7', 14.99, 25, 2006);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Superf*ckers Forever', '9781684050895', 17.99, 28, 1992);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Surfside Girls (Book One): The Secret of Danger Point', '978-1-60309-411-5', 14.99, 25, 1983);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Surfside Girls (Book Two): The Mystery at the Old Rancho', '978-1-60309-447-4', 14.99, 57, 2020);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('The Science of Surfing: A Surfside Girls Guide to the Ocean ', '978-1-60309-494-8', 9.99, 44, 1986);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Surfside Girls (Book 4): The Clue in the Reef ', '978-1-60309-529-7', 19.99, 50, 1996);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('The Surrogates Owner''s Manual', '978-1-60309-045-2', 39.95, 51, 2008);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('The Surrogates: Case Files #1', '978-1-60309-258-6', TBD, 59, 2024);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('They Called Us Enemy', '978-1-60309-450-4', 19.99, 42, 2007);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('They Called Us Enemy: Expanded Hardcover Edition', '978-1-60309-470-2', 29.99, 64, 2018);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Tonoharu (Part Two)', '978-0-9801023-3-8', 19.95, 83, 1993);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Tonoharu (Part Three)', '978-0-9801023-1-4', 24.95, 19, 2012);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Undergrowth', '978-1-60309-544-0', 24.99, 39, 2019);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('The Underwater Welder - HARDCOVER', '978-1-60309-392-7', 29.99, 27, 1989);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('The Underwater Welder - SIGNED & NUMBERED HARDCOVER', '978-1-60309-398-9', 49.99, 71, 2024);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('The Underwater Welder', '978-1-60309-074-2', 19.95, 47, 1985);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('The Unpetables (Book 1)', '978-1-60309-523-5', 9.99, 9, 1993);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('The Unpetables (Book 2): Unpetable in the City', '978-1-60309-545-7', 9.99, 77, 2024);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Voice of the Fire by Alan Moore with JosΘ Villarrubia', '978-1-60309-035-3', 14.95, 41, 1993);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Voice of the Fire (25th Anniversary Edition)', '978-1-60309-507-5', 14.99, 64, 1984);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('The Well', '978-1-60309-549-5', 29.99, 81, 1989);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('What If We Wereà (Book 2)', '978-1-60309-530-3', 14.99, 2, 1998);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Wolfpitch', '978-1-60309-539-6', 19.99, 59, 2002);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('You Wish (Book 1)', '978-1-60309-532-7', 14.99, 54, 1986);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('You Wish (Book 2): Wishborn', '978-1-60309-553-2', 14.99, 84, 2018);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Cosmic Cadets (Book 2): Accused!', '978-1-60309-570-9', 14.99, 58, 1988);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('F.A.R.M. System (Book 2): Rage', '978-1-60309-568-6', 19.99, 45, 1996);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Home Time: Twelve Days', '978-1-60309-582-2', 39.99, 22, 2021);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Ionheart', '978-1-60309-558-7', 24.99, 65, 2014);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Karmopolis (Book 1): The Land of Cars', '978-1-60309-554-9', 14.99, 51, 2020);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('The Land of Unfinished Dreams', '978-1-60309-555-6', 19.99, 34, 2014);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Lisa Cheese and Ghost Guitar (Book 2): The Rock God Complex', '978-1-60309-584-6', 19.99, 11, 2019);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Luna Express', '978-1-60309-580-8', 19.99, 38, 2001);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('More Weight: A Salem Story', '978-1-60309-560-0', 39.99, 23, 2024);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Order of the Night Jay (Book 2): The River Rises', '978-1-60309-562-4', 14.99, 25, 2017);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Pig Wife', '978-1-60309-572-3', 34.99, 80, 1989);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Psychic Investigators|Evil Exterminators', '978-1-60309-564-8', 14.99, 16, 2021);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Pup Pup Is the Boss of the Stars', '978-1-60309-581-5', 24.99, 33, 2021);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Rose Wolves (Book 2): Out of the Blue', '978-1-60309-569-3', 14.99, 84, 1985);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Spoops: The Little Spirits of Halloween', '978-1-60309-561-7', 14.99, 37, 1996);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('The Shadower', '978-1-60309-585-3', 19.99, 37, 2014);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Token City Wondercade: Season One', '978-1-60309-579-2', 14.99, 80, 2015);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Transitions: A Mother''s Journey', '978-1-60309-518-1', 19.99, 73, 2016);
+INSERT INTO books (title, isbn, price, current_stock, publication_year) VALUE ('Where There''s Smoke, There''s Dinner: Confessions of a Cartoonist Cook', '978-1-60309-567-9', 19.99, 60, 1998);
 ```
 ###  Install tools
 
@@ -239,11 +240,15 @@ The frontend will run at: [http://localhost:5173](http://localhost:5173)
 
 ## 🔗 API Endpoints
 
-| Endpoint        | Method | Description                |
-|-----------------|--------|----------------------------|
-| `/`             | GET    | Welcome message            |
-| `/listall`      | GET    | List all students          |
-| `/student/:id`  | GET    | Get a student by ID        |
+| Endpoint               | Method | Description                |
+|------------------------|--------|----------------------------|
+| `/`                    | GET    | Welcome message            |
+| `/books`               | GET    | List all books             |
+| `/books`               | POST   | Create new book            |
+| `/books/:id`           | GET    | Get a book by ID           |
+| `/books/:id`           | PUT    | Update book by ID          |
+| `/books/:id`           | DELETE | Delete book by ID          |
+| `/books/search/:title` | GET    | Search for books by title  |
 
 ---
 
@@ -267,79 +272,6 @@ csc4710-instructor-react-express/
 ---
 ### Specific file location guidance for implementing each CRUD endpoint and its frontend/backend/database responsibilities
 
- 
-
-## 🗂️ Where to Add CRUD Code: File-by-File Breakdown
-
-Here’s a clear guide on **what file to modify** and **what needs to be done** to implement each CRUD operation:
-
----
-
-### 🔧 1. Create (Add New Student)
-
-| Layer     | File                | What to Do |
-|-----------|---------------------|------------|
-| Database  | `students` table    | Ensure the table has columns: `id`, `name`, `birthday`, `gpa` |
-| Backend   | `Backend/server.js` | Add a POST route `/student` to insert into the database |
-| Frontend  | `Frontend/src/App.jsx` or separate form component | Add a form to collect student data and `fetch()` to POST it |
-
----
-
-### 📝 2. Read (Get All / Get by ID)
-
-✔️ Already Implemented
-
-| Layer     | File                | What It Does |
-|-----------|---------------------|--------------|
-| Backend   | `Backend/server.js` | Routes: `/listall`, `/student/:id` |
-| Frontend  | `Frontend/src/App.jsx` | Uses `useEffect()` and `fetch()` to get data and display in table |
-| Database  | `students` table    | Must contain test data for display |
-
----
-
-### ✏️ 3. Update (Edit Student)
-
-| Layer     | File                | What to Do |
-|-----------|---------------------|------------|
-| Database  | `students` table    | Make sure existing student entries exist for update |
-| Backend   | `Backend/server.js` | Add a PUT route `/student/:id` that updates fields by ID |
-| Frontend  | `Frontend/src/App.jsx` or `EditStudent.jsx` | Add edit form and send PUT request using `fetch()` |
-
----
-
-### ❌ 4. Delete (Remove Student)
-
-| Layer     | File                | What to Do |
-|-----------|---------------------|------------|
-| Backend   | `Backend/server.js` | Add a DELETE route `/student/:id` that removes a student |
-| Frontend  | `Frontend/src/App.jsx` | Add delete button next to each student and call DELETE using `fetch()` |
-| Database  | `students` table    | Deletion will affect rows permanently unless soft-delete is implemented |
-
----
-
-✅ Also, don't forget:
-- Use `express.json()` in `server.js` to handle POST and PUT JSON requests:
-  ```js
-  app.use(express.json());
-
----
-
-## 👨‍🏫 Designed For
-
-This project is intended for **the students** in computer science or software engineering programs who want to:
-
-- Understand the interaction between frontend and backend
-- Learn how databases integrate with REST APIs
-- Practice full stack web development with modern tools
-
----
-
 ## 📜 License
 
 This project is open-source for educational use under the [MIT License](LICENSE).
-
----
-
-## 🙋‍♂️ Need Help?
-
-If you're stuck or want to extend this project (e.g., add Create/Update/Delete, or auth), feel free to fork, open an issue, or reach out.
