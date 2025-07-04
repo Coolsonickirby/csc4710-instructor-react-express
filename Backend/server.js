@@ -31,7 +31,10 @@ app.get('/', (request, response) => {
      return response.json("Welcome to the DB class.")
 });
 
-// when the browser points to localhost:8081/listall
+
+// Route: GET <Server URL>/books
+// Response: {status, message, data}
+// Purpose: Returns all books from the database
 app.get('/books', (request, response) => {
     const stmt = "SELECT * FROM books"
     db.query(stmt, (err, data) => {
@@ -40,7 +43,9 @@ app.get('/books', (request, response) => {
     })
 });
 
-// when the browser points to localhost:8081/book/x, where x = 1, 2, 3...
+// Route: GET <Server URL>/books/:id
+// Response: {status, message, data}
+// Purpose: Returns book with specified ID
 app.get('/books/:id', (request, response) => {
     const bookId = request.params.id; // Extract the ID from the URL
     console.log(`Fetching book with ID: ${bookId}`);
@@ -54,6 +59,9 @@ app.get('/books/:id', (request, response) => {
 });
 
 // yoinked from the canvas assignment page
+// Route: GET <Server URL>/books/search/:title
+// Response: {status, message, data}
+// Purpose: Returns books with titles similar to specified title
 app.get('/books/search/:title', (req, res) => {
   const title = req.params.title;
   const sql = "SELECT * FROM books WHERE title LIKE ?";
@@ -63,6 +71,9 @@ app.get('/books/search/:title', (req, res) => {
   });
 });
 
+// Route: DELETE <Server URL>/books/:id
+// Response: {status, message, data}
+// Purpose: Deletes book with specified ID on the database
 app.delete('/books/:id', (request, response) => {
     const bookId = request.params.id;
     const sql = "DELETE FROM books WHERE id = ?";
@@ -73,12 +84,15 @@ app.delete('/books/:id', (request, response) => {
     });
 });
 
+// Route: PUT <Server URL>/books/:id
+// Response: {status, message, data}
+// Purpose: Updates book with specified ID on the database
 app.put('/books/:id', (request, response) => {
     const bookId = request.params.id;
     let params = request.body;
 
+    // Go through required keys, and if any is missing, then return an error specifying missed keys
     let required_keys = ["title", "isbn", "price", "current_stock", "publication_year"];
-    
     let params_keys = Object.keys(params);
     let missing_keys = [];
     required_keys.forEach(x => {
@@ -100,10 +114,14 @@ app.put('/books/:id', (request, response) => {
     });
 });
 
+// Route: POST <Server URL>/books
+// Response: {status, message, data}
+// Purpose: Creates book on the database
 app.post('/books', (request, response) => {
     let params = request.body;
-    let required_keys = ["title", "isbn", "price", "current_stock", "publication_year"];
     
+    // Go through required keys, and if any is missing, then return an error specifying missed keys
+    let required_keys = ["title", "isbn", "price", "current_stock", "publication_year"];
     let params_keys = Object.keys(params);
     let missing_keys = [];
     required_keys.forEach(x => {
