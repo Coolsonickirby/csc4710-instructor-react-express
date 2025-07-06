@@ -1,20 +1,22 @@
 
-# CSC4710 Instructor Full Stack Project
+# CSC4710 Instructor Full Stack Project (Modified for BookNest)
 
 A full stack web application designed for teaching and demonstration purposes in **CSC4710 (Database Systems)**. This project consists of a **React.js frontend** and an **Express.js + MySQL backend**. It showcases how to build and connect a dynamic user interface with a database-powered API.
 
-GitHub Repo: [https://github.com/atahabilder1/csc4710-instructor-react-express](https://github.com/atahabilder1/csc4710-instructor-react-express)
+GitHub Repo: [https://github.com/Coolsonickirby/csc4710-instructor-react-express](https://github.com/Coolsonickirby/csc4710-instructor-react-express)
 
 ---
 
 ## 📌 Project Description
 
-This application serves as a **BookNest Inventory Manager**, where instructors or users can:
+This application serves as a **BookNest Inventory Manager**, where employees can:
 
+- Create new book entries
 - View all book records
 - Fetch individual book details by ID
-- Learn how frontend components interact with backend routes
-- Understand full stack CRUD operations (read-only for now)
+- Search for books by title
+- Modify book record
+- Delete book records
 
 The backend provides **RESTful API endpoints** built with **Express**, which interacts with a **MySQL database**. The frontend, developed with **React** and powered by **Vite**, consumes these APIs and displays dynamic data.
 
