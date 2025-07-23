@@ -9,7 +9,16 @@ GitHub Repo: [https://github.com/Coolsonickirby/csc4710-instructor-react-express
 
 ## 📌 Project Description
 
-This application serves as a **BookNest Inventory Manager**, where employees can:
+This application serves as a **BookNest Customer System** and **BookNest Inventory System**, where customers can:
+- Look at avaliable books
+- Search for books by title and price
+- Add books to cart
+- Change Quantity of amount of books to order
+- Place order
+- Look at Order History
+
+
+and where admins can:
 
 - Create new book entries
 - View all book records
@@ -22,13 +31,49 @@ The backend provides **RESTful API endpoints** built with **Express**, which int
 
 ---
 
-Create a database named test. Create a table called students in the test database as follows:
+Run the following SQL
 ```sql
 -- Create the database
 CREATE DATABASE throwaway;
 
 -- Use the database
 USE throwaway;
+
+CREATE TABLE IF NOT EXISTS `admins` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `username` varchar(50) NOT NULL,
+  `password` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+CREATE TABLE IF NOT EXISTS `customers` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(500) NOT NULL,
+  `email` varchar(500) NOT NULL,
+  `password` varchar(1024) NOT NULL,
+  `shipping_address` varchar(500) NOT NULL,
+  `phone` varchar(500) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `email` (`email`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE IF NOT EXISTS `order` (
+  `OrderID` int NOT NULL AUTO_INCREMENT,
+  `OrderDate` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `TotalAmount` decimal(10,2) DEFAULT NULL,
+  `CustomerID` int DEFAULT NULL,
+  PRIMARY KEY (`OrderID`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE IF NOT EXISTS `orderdata` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `BookID` int NOT NULL,
+  `BookPrice` double NOT NULL,
+  `OrderID` int NOT NULL,
+  `quantityOrdered` int NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Create the students table
 CREATE TABLE `books` (
@@ -43,6 +88,9 @@ CREATE TABLE `books` (
 COLLATE='utf8mb3_general_ci'
 ENGINE=InnoDB
 AUTO_INCREMENT=1;
+
+-- Password = password
+INSERT INTO `admins` (`username`, `password`) VALUES ('admin', '$2b$08$ojphL3EjcG.Y.ZWG3n9Sv.jGj4Ctg4W9pnLDGWcO2MxbQEvWxxN3a');
 
 -- Data sourced from https://www.topshelfcomix.com/catalog/isbn-list
 -- Insert records into books
@@ -242,15 +290,22 @@ The frontend will run at: [http://localhost:5173](http://localhost:5173)
 
 ## 🔗 API Endpoints
 
-| Endpoint               | Method | Description                |
-|------------------------|--------|----------------------------|
-| `/`                    | GET    | Welcome message            |
-| `/books`               | GET    | List all books             |
-| `/books`               | POST   | Create new book            |
-| `/books/:id`           | GET    | Get a book by ID           |
-| `/books/:id`           | PUT    | Update book by ID          |
-| `/books/:id`           | DELETE | Delete book by ID          |
-| `/books/search/:title` | GET    | Search for books by title  |
+| Endpoint                    | Method | Description                |
+|-----------------------------|--------|----------------------------|
+| `/`                         | GET    | Welcome message            |
+| `/books`                    | GET    | List all books             |
+| `/books`                    | POST   | Create new book            |
+| `/books/:id`                | GET    | Get a book by ID           |
+| `/books/:id`                | PUT    | Update book by ID          |
+| `/books/:id`                | DELETE | Delete book by ID          |
+| `/books/search/:title`      | GET    | Search for books by title  |
+| `/customers/login`          | POST   | Log in for Customer        |
+| `/customer/register`        | POST   | Register Customer to DB    |
+| `/customer/order`           | POST   | Place order for Customer   |
+| `/customer/getOrderHistory` | POST   | Get Customer Order History |
+| `/admin/login`              | POST   | Log in for Admin           |
+
+
 
 ---
 
@@ -260,11 +315,23 @@ The frontend will run at: [http://localhost:5173](http://localhost:5173)
 csc4710-instructor-react-express/
 │
 ├── Backend/
+│   ├── admins.js
+│   ├── books.js
+│   ├── customers.js
 │   ├── server.js
 │   ├── package.json
 │
 ├── Frontend/
 │   ├── src/
+│       ├── Admin/
+│           ├── AdminLogin.jsx
+│       ├── Customer/
+│           ├── CustomerLogin.jsx
+│           ├── CustomerRegistration.jsx
+│           ├── CustomerShop.jsx
+|       ├── BooksDatabase.jsx
+|       ├── Logout.jsx
+|       ├── main.jsx
 │   ├── index.html
 │   ├── package.json
 │
