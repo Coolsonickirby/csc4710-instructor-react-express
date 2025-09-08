@@ -1,4 +1,4 @@
-
+Hello!
 # CSC4710 Instructor Full Stack Project
 
 A full stack web application designed for teaching and demonstration purposes in **CSC4710 (Database Systems)**. This project consists of a **React.js frontend** and an **Express.js + MySQL backend**. It showcases how to build and connect a dynamic user interface with a database-powered API.
